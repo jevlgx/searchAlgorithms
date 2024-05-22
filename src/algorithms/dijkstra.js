@@ -145,8 +145,7 @@ var Graph = (function (undefined) {
 
 
 
-function dijkstra(adjMatrix) {
-  console.log(adjMatrix)
+function dijkstra(adjMatrix, som1, som2) {
   let transformMatrix = {}
 
   adjMatrix.forEach((value, index)=>{
@@ -159,21 +158,31 @@ function dijkstra(adjMatrix) {
       transformMatrix[index+1] = enfants
   })
   let graph = new Graph(transformMatrix);
-  let minGraph = graph.findShortestPath("1","4")
+  let minGraph = graph.findShortestPath(som1, som2)
   let minDistance = 0
+
+	let distanceSommets = (som1, som2)=>{
+		return (transformMatrix[som1])[som2]
+	}
 
   for(let i = 0; i < minGraph.length - 1; i++){
     let sommetCourant = minGraph[i]
     let sommetSuivant = minGraph[i+1]
-    minDistance += (transformMatrix[sommetCourant])[sommetSuivant] // distance entre le sommet courant et le sommet suivant
+    minDistance += distanceSommets(sommetCourant, sommetSuivant)// distance entre le sommet courant et le sommet suivant
+  }
+
+  let solution=[]
+  for(let i=0; i < minGraph.length-1; i++){
+	som1 = minGraph[i]
+	som2 = minGraph[i+1]
+	solution.push([
+		parseInt(som2)-1,
+		parseInt(som1)-1,
+		distanceSommets(som1, som2)
+	])
   }
   
-  console.log("transform matrix")
-  console.log(transformMatrix)
-  console.log(minGraph)
-  console.log(minDistance)
-
-  return [minGraph,minDistance];
+  return {"minGraph": minGraph,"minDistance": minDistance, "solution": solution};
 }
 
 export default dijkstra;

@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+"use client"
+import React, { useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -8,14 +9,11 @@ import prim from '../../algorithms/prim';
 import { convertMatrixToIntegers } from '../../helper/helper';
 
 // Compression Forms Component
-const Forms = ({ algorithm, setAlgorithm, adjMatrix = [], setSolution, setDijkstra }) => {
+const Forms = ({ algorithm, setAlgorithm, adjMatrix = [], setSolution }) => {
+    
     const textRef = useRef(null);
-
-    const handleCheckbox = (event) => {
-        setSolution(null);
-
-    };
-
+    const [som1, setSom1] = useState("")
+    const [som2, setSom2] = useState("")
 
     // Do the process based on the algorithm
     const handleSubmit = (e) => {
@@ -31,17 +29,21 @@ const Forms = ({ algorithm, setAlgorithm, adjMatrix = [], setSolution, setDijkst
             if (algorithm === 1) {
                 // Do Prim
                 let primMST = prim(adjacency);
+                console.log("prim", primMST)
                 primMST.length === adjMatrix.length - 1 ? setSolution(primMST) : setSolution(null);
             }
             if (algorithm === 2) {
                 // Do Kruskal
                 let kruskalMST = kruskal(adjacency);
+                console.log("kruskal",kruskalMST)
                 kruskalMST.length === adjMatrix.length - 1 ? setSolution(kruskalMST) : setSolution(null);
-                console.log(kruskalMST)
             } if (algorithm === 3) {
                 // Do Dijkstra
-                let dijkstraMST = dijkstra(adjacency);
-                setDijkstra(dijkstraMST)
+                if( som1!="" && som2!="" ){
+                    let dijkstraMST = dijkstra(adjacency, som1, som2)
+                    console.log("solution dij",dijkstraMST.solution)
+                    setSolution(dijkstraMST.solution)
+                }
             }
         } else {
             toast.error("You haven't load any .txt file, yet!", {
@@ -50,48 +52,13 @@ const Forms = ({ algorithm, setAlgorithm, adjMatrix = [], setSolution, setDijkst
         }
     }
 
-    const isConfigFileValid = ({ lines }) => {
-        if (!lines || lines.length === 0 || lines[0].length === 0) return { "success": false, "msg": "Configuration file is empty!" }
-
-        const matrix = lines.map((line) => line.split(/\s+/))
-        const row = matrix.length
-        const column = matrix[0].length
-
-        for (var i = 0; i < row; i++) {
-            const line = matrix[i]
-            if (line.length !== column)
-                return {
-                    "success": false,
-                    "msg": "Configuration file contains rows with different length!"
-                }
-
-            for (var j = 0; j < column; j++) {
-                var stringValue = line[j]
-                if (!(/^\d+$/.test(stringValue)))
-                    return {
-                        "success": false,
-                        "msg": "Configuration file contains invalid character(s)!\nPositive numbers are the only valid characters"
-                    }
-            }
+    function checkNumber(event) {
+        const input = event.target;
+        const value = input.value;
+        // Vérifier si la valeur ne contient que des chiffres
+        if (!value.match(/^[0-9]*$/) || value=="0" || (value > adjMatrix.length)) {
+            input.value = value.slice(0, -1)
         }
-
-        if (row !== column)
-            return {
-                "success": false,
-                "msg": "Adjancency matrix must have the same rows and columns count!"
-            }
-
-        for (j = 0; j < row; j++) {
-            for (var k = 0; k < column; k++) {
-                if (matrix[j][k] !== matrix[k][j])
-                    return {
-                        "success": false,
-                        "msg": "Adjancency matrix for undirected graph should be symetric!"
-                    }
-            }
-        }
-
-        return { "success": true, "msg": "Configuration File is valid", "data": matrix };
     }
 
     return (
@@ -119,6 +86,15 @@ const Forms = ({ algorithm, setAlgorithm, adjMatrix = [], setSolution, setDijkst
                                     <input type="radio" id="dijkstra" name="dijkstra" value="Dijkstra" checked={algorithm === 3} onChange={() => { setAlgorithm(3); setSolution(null);  }} className="peer hidden"></input>
                                     <label htmlFor="dijkstra" className="text-sm block cursor-pointer select-none rounded-xl p-2 text-center peer-checked:bg-pinkyRed font-bold peer-checked:text-whitel justify-center items-center">Dijkstra</label>
                                 </div>
+                                {(algorithm === 3) &&
+                                    <div className="flex mt-2 gap-8">
+                                        <p>Sommets</p>
+                                        <div className="flex gap-4">
+                                            <input type="text" onChange={(event) => {checkNumber(event); setSom1(event.target.value)}} pattern="[0-9]*" className="w-10 h-10 text-center" ></input>
+                                            <input type="text" onChange={(event) => {checkNumber(event); setSom2(event.target.value)}} pattern="[0-9]*" className="w-10 h-10 text-center" ></input>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                             <button
                                 className="w-full px-4 py-1.5 mt-3 text-white text-sm font-medium bg-pinkyRed hover:bg-indigo-400 active:bg-indigo-600 rounded-lg duration-150"

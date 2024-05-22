@@ -6,7 +6,7 @@ import Dropdown from "./components/Dropdown/Dropdown";
 import Form from "./components/Forms/Forms";
 import GraphSet from "./components/Graph/GraphConfig";
 import { calculateTotalWeight } from './helper/helper';
-//import dijkstra from "./algorithms/dijkstra";
+import dijkstra from "./algorithms/dijkstra";
 
 const backgroundStyle = {
     backgroundColor: "#ECEEF9",
@@ -19,14 +19,11 @@ const backgroundStyle = {
 function App() {
     const [adjMatrix, setMatrix] = useState([]);
     const [solution, setSolution] = useState(null);
-    let [resultatDijkstra, setDijkstra] = useState(null)
     const [algorithm, setAlgorithm] = useState(1);
     const [from, setFrom] = useState(0);
     const [to, setTo] = useState(0);
     const [weight, setWeight] = useState(1);
     const [adjArray, setArray] = useState([]);
-
-
 
     useEffect(() => {
         if (adjMatrix) {
@@ -93,7 +90,7 @@ function App() {
             <div className="w-full bg-light flex rounded-xl text-gray-700">
                 <div className="bg-white w-full mx-auto shadow-xl rounded-xl text-lg flex flex-row h-full">
                     <div className="text-left flex flex-col w-1/4 p-8 bg-primaryGray rounded-r-xl">
-                        <Form algorithm={algorithm} setAlgorithm={setAlgorithm} setMatrix={setMatrix} adjMatrix={adjMatrix} setSolution={setSolution} setDijkstra={setDijkstra}/>
+                        <Form algorithm={algorithm} setAlgorithm={setAlgorithm} setMatrix={setMatrix} adjMatrix={adjMatrix} setSolution={setSolution}/>
                     </div>
                     <div className="text-left flex flex-col w-3/4 space-y-3 p-8">
                         <div className='h-1/6 flex flex-row'>
@@ -152,13 +149,13 @@ function App() {
                                 ) : algorithm === 3 ? (
                                     <h3 className="text-lg py-1.5 font-semibold text-pinkyRed">Algorithme de Dijkstra</h3>
                                 ) : null}
-                                {resultatDijkstra&& !solution &&(
+                                {/* {resultatDijkstra && algorithm === 3 &&(
                                     <>
-                                        <h3>Poids total : {resultatDijkstra[1]}</h3>
+                                        <h3>Poids total : {resultatDijkstra.minDistance}</h3>
                                         <h3>Ordre :</h3>
                                         <div>
                                             {function(){
-                                                let minGraph = resultatDijkstra[0]
+                                                let minGraph = resultatDijkstra.minGraph
                                                 let sokl = ""
                                                 for(let i = 0; i<minGraph.length-1; i++){
                                                     sokl = sokl + "som"+minGraph[i]+"->"
@@ -170,38 +167,39 @@ function App() {
                                             }
                                         </div>
                                     </>
-                                )}
-                                {console.log("debut")}
-                                {console.log(solution)}
+                                )} */}
                                 {solution && solution.length === adjMatrix.length - 1 && (
                                     <>
                                         <h3>Poids total : {calculateTotalWeight(solution)}</h3>
-                                        {/* {console.log("fin")}
-                                        {console.log(solution)}
-                                        {console.log(solution[0])}
-                                        {console.log(solution[1])}
-                                        {console.log(solution[2])}
-
-                                        {
-                                            solution.map((value, index)=>{
-                                                console.log(index, value)
-                                            })
-                                        } */}
                                         <h3>Ordre :</h3>
                                         <div>
                                             
                                             {solution.map((obj, index) => (
                                                 <div>
-                                                    {/* <div>{obj}</div> */}
                                                     <div>Som{obj[0] + 1} - Som{obj[1] + 1} ({obj[2]})</div>
                                                 </div>
                                             ))}
                                         </div>
                                     </>
                                 )}
-                                {(!solution || solution.length !== adjMatrix.length - 1) && (
-                                    <div className="text-base">Aucune solution</div>
+                                {solution && solution.length != adjMatrix.length - 1 && (//cas de dijkstra
+                                    <>
+                                        <h3>Poids total : {calculateTotalWeight(solution)}</h3>
+                                        <h3>Ordre :</h3>
+                                        <div>
+                                            
+                                            {solution.map((obj, index) => (
+                                                <div>
+                                                    <div>Som{obj[0] + 1} - Som{obj[1] + 1} ({obj[2]})</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
                                 )}
+                                {/* 
+                                {(!solution || solution.length !== adjMatrix.length - 1) &&(
+                                    <div className="text-base">Aucune solution</div>
+                                )} */}
                             </div>
                         </div>
                     </div>
